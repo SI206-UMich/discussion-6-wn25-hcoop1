@@ -1,5 +1,6 @@
 import unittest
 import os
+import csv
 
 
 def load_csv(f):
@@ -18,6 +19,21 @@ def load_csv(f):
     base_path = os.path.abspath(os.path.dirname(__file__))
     full_path = os.path.join(base_path, f)
     # use this 'full_path' variable as the file that you open
+    data = {} 
+    with open(full_path, newline='')as csvfile: 
+        reader= csv.reader(csvfile)
+        headers = next(reader)
+
+        years = headers[1:]
+
+        for row in reader:
+            month = row[0]  # The first element is the month
+            for index, year in enumerate(years):
+                if year not in data:
+                    data[year] = {}
+                data[year][month] = row[index + 1]  # map month to the respective year's value
+
+    return data
 
 def get_annual_max(d):
     '''
@@ -31,6 +47,13 @@ def get_annual_max(d):
     Note: Don't strip or otherwise modify strings. Do not change datatypes except where necessary.
         You'll have to change vals to int to compare them. 
     '''
+  
+    result = []
+    for year, months in d.items():
+        max_month, max_val = max(months.items(), key=lambda x: int(x[1]))
+        result.append((year, max_month, int(max_val)))
+    
+    return result
     pass
 
 def get_month_avg(d):
@@ -45,6 +68,13 @@ def get_month_avg(d):
     Note: Don't strip or otherwise modify strings. Do not change datatypes except where necessary. 
         You'll have to make the vals int or float here and round the avg to pass tests.
     '''
+    averages = {}
+    for year, months in d.items():
+        avg_val = round(sum(int(v) for v in months.values()) / len(months))
+        averages[year] = avg_val
+    
+    return averages
+
     pass
 
 class dis7_test(unittest.TestCase):
